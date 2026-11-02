@@ -55,13 +55,15 @@ extension ProfileStatePatterns on ProfileState {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( ProfileInitial value)?  initial,TResult Function( ProfileLoading value)?  loading,TResult Function( ProfileSuccess value)?  success,TResult Function( ProfileFailure value)?  failure,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( ProfileInitial value)?  initial,TResult Function( ProfileLoading value)?  loading,TResult Function( ProfileSuccess value)?  success,TResult Function( ProfileUpdating value)?  updating,TResult Function( ProfileUpdateSuccess value)?  updateSuccess,TResult Function( ProfileFailure value)?  failure,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case ProfileInitial() when initial != null:
 return initial(_that);case ProfileLoading() when loading != null:
 return loading(_that);case ProfileSuccess() when success != null:
-return success(_that);case ProfileFailure() when failure != null:
+return success(_that);case ProfileUpdating() when updating != null:
+return updating(_that);case ProfileUpdateSuccess() when updateSuccess != null:
+return updateSuccess(_that);case ProfileFailure() when failure != null:
 return failure(_that);case _:
   return orElse();
 
@@ -80,13 +82,15 @@ return failure(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( ProfileInitial value)  initial,required TResult Function( ProfileLoading value)  loading,required TResult Function( ProfileSuccess value)  success,required TResult Function( ProfileFailure value)  failure,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( ProfileInitial value)  initial,required TResult Function( ProfileLoading value)  loading,required TResult Function( ProfileSuccess value)  success,required TResult Function( ProfileUpdating value)  updating,required TResult Function( ProfileUpdateSuccess value)  updateSuccess,required TResult Function( ProfileFailure value)  failure,}){
 final _that = this;
 switch (_that) {
 case ProfileInitial():
 return initial(_that);case ProfileLoading():
 return loading(_that);case ProfileSuccess():
-return success(_that);case ProfileFailure():
+return success(_that);case ProfileUpdating():
+return updating(_that);case ProfileUpdateSuccess():
+return updateSuccess(_that);case ProfileFailure():
 return failure(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
@@ -101,13 +105,15 @@ return failure(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( ProfileInitial value)?  initial,TResult? Function( ProfileLoading value)?  loading,TResult? Function( ProfileSuccess value)?  success,TResult? Function( ProfileFailure value)?  failure,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( ProfileInitial value)?  initial,TResult? Function( ProfileLoading value)?  loading,TResult? Function( ProfileSuccess value)?  success,TResult? Function( ProfileUpdating value)?  updating,TResult? Function( ProfileUpdateSuccess value)?  updateSuccess,TResult? Function( ProfileFailure value)?  failure,}){
 final _that = this;
 switch (_that) {
 case ProfileInitial() when initial != null:
 return initial(_that);case ProfileLoading() when loading != null:
 return loading(_that);case ProfileSuccess() when success != null:
-return success(_that);case ProfileFailure() when failure != null:
+return success(_that);case ProfileUpdating() when updating != null:
+return updating(_that);case ProfileUpdateSuccess() when updateSuccess != null:
+return updateSuccess(_that);case ProfileFailure() when failure != null:
 return failure(_that);case _:
   return null;
 
@@ -125,12 +131,14 @@ return failure(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( ProfileResponse profile)?  success,TResult Function( Failure failure)?  failure,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( ProfileResponse profile)?  success,TResult Function()?  updating,TResult Function( ProfileResponse profile)?  updateSuccess,TResult Function( Failure failure)?  failure,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case ProfileInitial() when initial != null:
 return initial();case ProfileLoading() when loading != null:
 return loading();case ProfileSuccess() when success != null:
-return success(_that.profile);case ProfileFailure() when failure != null:
+return success(_that.profile);case ProfileUpdating() when updating != null:
+return updating();case ProfileUpdateSuccess() when updateSuccess != null:
+return updateSuccess(_that.profile);case ProfileFailure() when failure != null:
 return failure(_that.failure);case _:
   return orElse();
 
@@ -149,12 +157,14 @@ return failure(_that.failure);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( ProfileResponse profile)  success,required TResult Function( Failure failure)  failure,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( ProfileResponse profile)  success,required TResult Function()  updating,required TResult Function( ProfileResponse profile)  updateSuccess,required TResult Function( Failure failure)  failure,}) {final _that = this;
 switch (_that) {
 case ProfileInitial():
 return initial();case ProfileLoading():
 return loading();case ProfileSuccess():
-return success(_that.profile);case ProfileFailure():
+return success(_that.profile);case ProfileUpdating():
+return updating();case ProfileUpdateSuccess():
+return updateSuccess(_that.profile);case ProfileFailure():
 return failure(_that.failure);}
 }
 /// A variant of `when` that fallback to returning `null`
@@ -169,12 +179,14 @@ return failure(_that.failure);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( ProfileResponse profile)?  success,TResult? Function( Failure failure)?  failure,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( ProfileResponse profile)?  success,TResult? Function()?  updating,TResult? Function( ProfileResponse profile)?  updateSuccess,TResult? Function( Failure failure)?  failure,}) {final _that = this;
 switch (_that) {
 case ProfileInitial() when initial != null:
 return initial();case ProfileLoading() when loading != null:
 return loading();case ProfileSuccess() when success != null:
-return success(_that.profile);case ProfileFailure() when failure != null:
+return success(_that.profile);case ProfileUpdating() when updating != null:
+return updating();case ProfileUpdateSuccess() when updateSuccess != null:
+return updateSuccess(_that.profile);case ProfileFailure() when failure != null:
 return failure(_that.failure);case _:
   return null;
 
@@ -305,6 +317,113 @@ class _$ProfileSuccessCopyWithImpl<$Res>
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? profile = null,}) {
   return _then(ProfileSuccess(
+profile: null == profile ? _self.profile : profile // ignore: cast_nullable_to_non_nullable
+as ProfileResponse,
+  ));
+}
+
+/// Create a copy of ProfileState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ProfileResponseCopyWith<$Res> get profile {
+  
+  return $ProfileResponseCopyWith<$Res>(_self.profile, (value) {
+    return _then(_self.copyWith(profile: value));
+  });
+}
+}
+
+/// @nodoc
+
+
+class ProfileUpdating implements ProfileState {
+  const ProfileUpdating();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProfileUpdating);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'ProfileState.updating()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class ProfileUpdateSuccess implements ProfileState {
+  const ProfileUpdateSuccess({required this.profile});
+  
+
+ final  ProfileResponse profile;
+
+/// Create a copy of ProfileState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ProfileUpdateSuccessCopyWith<ProfileUpdateSuccess> get copyWith => _$ProfileUpdateSuccessCopyWithImpl<ProfileUpdateSuccess>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProfileUpdateSuccess&&(identical(other.profile, profile) || other.profile == profile));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,profile);
+
+@override
+String toString() {
+  return 'ProfileState.updateSuccess(profile: $profile)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ProfileUpdateSuccessCopyWith<$Res> implements $ProfileStateCopyWith<$Res> {
+  factory $ProfileUpdateSuccessCopyWith(ProfileUpdateSuccess value, $Res Function(ProfileUpdateSuccess) _then) = _$ProfileUpdateSuccessCopyWithImpl;
+@useResult
+$Res call({
+ ProfileResponse profile
+});
+
+
+$ProfileResponseCopyWith<$Res> get profile;
+
+}
+/// @nodoc
+class _$ProfileUpdateSuccessCopyWithImpl<$Res>
+    implements $ProfileUpdateSuccessCopyWith<$Res> {
+  _$ProfileUpdateSuccessCopyWithImpl(this._self, this._then);
+
+  final ProfileUpdateSuccess _self;
+  final $Res Function(ProfileUpdateSuccess) _then;
+
+/// Create a copy of ProfileState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? profile = null,}) {
+  return _then(ProfileUpdateSuccess(
 profile: null == profile ? _self.profile : profile // ignore: cast_nullable_to_non_nullable
 as ProfileResponse,
   ));

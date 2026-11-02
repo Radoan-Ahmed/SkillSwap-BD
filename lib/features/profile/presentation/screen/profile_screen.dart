@@ -33,19 +33,27 @@ class ProfileScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),
-            onPressed: () => context.pushNamed(RouteNames.editProfile),
+            onPressed: () async {
+              final updated = await context.pushNamed(RouteNames.editProfile);
+              if (updated == true && context.mounted) {
+                await context.read<ProfileCubit>().load(currentUserId);
+              }
+            },
           ),
         ],
       ),
       body: BlocBuilder<ProfileCubit, ProfileState>(
         builder: (context, state) => switch (state) {
-          ProfileInitial() || ProfileLoading() => const AppLoader(),
+          ProfileInitial() ||
+          ProfileLoading() ||
+          ProfileUpdating() => const AppLoader(),
           ProfileFailure(:final failure) => ErrorStateWidget(
               message: failure.toMessage(context),
               onRetry: () =>
                   context.read<ProfileCubit>().load(currentUserId),
             ),
-          ProfileSuccess(:final profile) => SingleChildScrollView(
+          ProfileSuccess(:final profile) ||
+          ProfileUpdateSuccess(:final profile) => SingleChildScrollView(
               padding: const EdgeInsets.all(AppSpacing.lg),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

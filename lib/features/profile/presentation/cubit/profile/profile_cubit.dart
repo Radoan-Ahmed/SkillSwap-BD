@@ -31,11 +31,11 @@ class ProfileCubit extends Cubit<ProfileState> {
   }
 
   Future<void> update(UpdateProfileRequest request) async {
-    emit(const ProfileState.loading());
+    emit(const ProfileState.updating());
     final result = await _updateProfile(request);
     switch (result) {
       case Ok(:final data):
-        emit(ProfileState.success(profile: data));
+        emit(ProfileState.updateSuccess(profile: data));
       case Err(:final failure):
         emit(ProfileState.failure(failure: failure));
     }

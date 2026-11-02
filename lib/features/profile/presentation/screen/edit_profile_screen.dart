@@ -30,16 +30,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final currentProfile = context.read<ProfileCubit>().state;
     final initialName = switch (currentProfile) {
       ProfileSuccess(:final profile) => profile.fullName,
+      ProfileUpdateSuccess(:final profile) => profile.fullName,
       _ => '',
     };
     final initialBio = switch (currentProfile) {
       ProfileSuccess(:final profile) => profile.bio,
+      ProfileUpdateSuccess(:final profile) => profile.bio,
       _ => '',
     };
     _nameController = TextEditingController(text: initialName);
     _bioController = TextEditingController(text: initialBio);
 
     if (currentProfile case ProfileSuccess(:final profile)) {
+      context.read<ProfileFormCubit>().init(profile);
+    } else if (currentProfile case ProfileUpdateSuccess(:final profile)) {
       context.read<ProfileFormCubit>().init(profile);
     }
   }
@@ -60,12 +64,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       body: BlocListener<ProfileCubit, ProfileState>(
         listener: (context, state) {
           switch (state) {
-            case ProfileSuccess():
+            case ProfileSuccess(:final profile):
+              if (_nameController.text.isEmpty && profile.fullName.isNotEmpty) {
+                _nameController.text = profile.fullName;
+                _bioController.text = profile.bio;
+                context.read<ProfileFormCubit>().init(profile);
+              }
+            case ProfileUpdateSuccess():
               AppSnackbar.success(context, context.tr.profileSaveSuccess);
-              context.pop();
+              context.pop(true);
             case ProfileFailure(:final failure):
               AppSnackbar.error(context, failure.toMessage(context));
-            case ProfileInitial() || ProfileLoading():
+            case ProfileInitial() || ProfileLoading() || ProfileUpdating():
               break;
           }
         },
@@ -73,7 +83,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           builder: (context, formState) {
             final formCubit = context.read<ProfileFormCubit>();
             final isSaving =
-                context.watch<ProfileCubit>().state is ProfileLoading;
+                context.watch<ProfileCubit>().state is ProfileUpdating;
 
             return SingleChildScrollView(
               padding: const EdgeInsets.all(AppSpacing.lg),
