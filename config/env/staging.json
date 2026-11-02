@@ -1,0 +1,6 @@
+{
+  "FLAVOR": "staging",
+  "BASE_URL": "https://staging-api.skillswapbd.com",
+  "SUPABASE_URL": "https://placeholder.supabase.co",
+  "SUPABASE_ANON_KEY": "placeholder_anon_key"
+}

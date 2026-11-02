@@ -1,0 +1,12 @@
+include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "lib/core/di/injection.config.dart"
+    - "lib/core/l10n/generated/**"
+
+linter:
+  rules:
+    public_member_api_docs: false

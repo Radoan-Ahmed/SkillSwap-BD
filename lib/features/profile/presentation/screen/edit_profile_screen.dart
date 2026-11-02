@@ -1,0 +1,131 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:skill_swap_bd/core/error/failure_message.dart';
+import 'package:skill_swap_bd/core/extensions/context_extension.dart';
+import 'package:skill_swap_bd/core/theme/app_spacing.dart';
+import 'package:skill_swap_bd/core/utils/validators.dart';
+import 'package:skill_swap_bd/core/widgets/app_app_bar.dart';
+import 'package:skill_swap_bd/core/widgets/app_button.dart';
+import 'package:skill_swap_bd/core/widgets/app_text_field.dart';
+import 'package:skill_swap_bd/core/widgets/feedback/app_snackbar.dart';
+import 'package:skill_swap_bd/features/profile/presentation/cubit/profile/profile_cubit.dart';
+import 'package:skill_swap_bd/features/profile/presentation/cubit/profile_form/profile_form_cubit.dart';
+import 'package:skill_swap_bd/features/profile/presentation/widget/skill_selector_widget.dart';
+
+class EditProfileScreen extends StatefulWidget {
+  const EditProfileScreen({super.key});
+
+  @override
+  State<EditProfileScreen> createState() => _EditProfileScreenState();
+}
+
+class _EditProfileScreenState extends State<EditProfileScreen> {
+  late final TextEditingController _nameController;
+  late final TextEditingController _bioController;
+
+  @override
+  void initState() {
+    super.initState();
+    final currentProfile = context.read<ProfileCubit>().state;
+    final initialName = switch (currentProfile) {
+      ProfileSuccess(:final profile) => profile.fullName,
+      _ => '',
+    };
+    final initialBio = switch (currentProfile) {
+      ProfileSuccess(:final profile) => profile.bio,
+      _ => '',
+    };
+    _nameController = TextEditingController(text: initialName);
+    _bioController = TextEditingController(text: initialBio);
+
+    if (currentProfile case ProfileSuccess(:final profile)) {
+      context.read<ProfileFormCubit>().init(profile);
+    }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _bioController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppAppBar(
+        title: context.tr.profileEditTitle,
+      ),
+      body: BlocListener<ProfileCubit, ProfileState>(
+        listener: (context, state) {
+          switch (state) {
+            case ProfileSuccess():
+              AppSnackbar.success(context, context.tr.profileSaveSuccess);
+              context.pop();
+            case ProfileFailure(:final failure):
+              AppSnackbar.error(context, failure.toMessage(context));
+            case ProfileInitial() || ProfileLoading():
+              break;
+          }
+        },
+        child: BlocBuilder<ProfileFormCubit, ProfileFormState>(
+          builder: (context, formState) {
+            final formCubit = context.read<ProfileFormCubit>();
+            final isSaving =
+                context.watch<ProfileCubit>().state is ProfileLoading;
+
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  AppTextField(
+                    controller: _nameController,
+                    label: context.tr.profileFullNameLabel,
+                    errorText: formState.fullNameError?.toMessage(context),
+                    onChanged: formCubit.fullNameChanged,
+                  ),
+                  Gaps.v16,
+                  AppTextField(
+                    controller: _bioController,
+                    label: context.tr.profileBioLabel,
+                    maxLines: 3,
+                    onChanged: formCubit.bioChanged,
+                  ),
+                  Gaps.v24,
+                  SkillSelectorWidget(
+                    title: context.tr.profileSkillsOfferedLabel,
+                    skills: formState.skillsOffered,
+                    onAddSkill: formCubit.addSkillOffered,
+                    onRemoveSkill: formCubit.removeSkillOffered,
+                  ),
+                  Gaps.v24,
+                  SkillSelectorWidget(
+                    title: context.tr.profileSkillsLearnedLabel,
+                    skills: formState.skillsLearned,
+                    isOffered: false,
+                    onAddSkill: formCubit.addSkillLearned,
+                    onRemoveSkill: formCubit.removeSkillLearned,
+                  ),
+                  Gaps.v32,
+                  AppButton(
+                    label: context.tr.commonSave,
+                    isLoading: isSaving,
+                    onPressed: () {
+                      if (formCubit.validate()) {
+                        context
+                            .read<ProfileCubit>()
+                            .update(formCubit.buildRequest());
+                      }
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
