@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -19,8 +20,26 @@ import 'package:skill_swap_bd/features/profile/presentation/cubit/profile_form/p
 import 'package:skill_swap_bd/features/profile/presentation/screen/edit_profile_screen.dart';
 import 'package:skill_swap_bd/features/profile/presentation/screen/profile_screen.dart';
 
+class GoRouterRefreshStream extends ChangeNotifier {
+  GoRouterRefreshStream(Stream<dynamic> stream) {
+    notifyListeners();
+    _subscription = stream.asBroadcastStream().listen(
+          (dynamic _) => notifyListeners(),
+        );
+  }
+
+  late final StreamSubscription<dynamic> _subscription;
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+}
+
 final appRouter = GoRouter(
   initialLocation: RoutePaths.discovery,
+  refreshListenable: GoRouterRefreshStream(sl<SessionCubit>().stream),
   redirect: (BuildContext context, GoRouterState state) {
     final sessionState = sl<SessionCubit>().state;
     final isAuthenticated = sessionState is SessionAuthenticated;

@@ -135,6 +135,9 @@ class ProfileScreen extends StatelessWidget {
                     isFullWidth: true,
                     onPressed: () async {
                       await sl<SignOutUsecase>()();
+                      if (context.mounted) {
+                        context.goNamed(RouteNames.login);
+                      }
                     },
                   ),
                 ],
