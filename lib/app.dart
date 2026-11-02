@@ -15,6 +15,7 @@ class App extends StatelessWidget {
     return MultiBlocProvider(
       providers: [BlocProvider<SessionCubit>.value(value: sl<SessionCubit>())],
       child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
         title: 'Skill Swap BD',
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,

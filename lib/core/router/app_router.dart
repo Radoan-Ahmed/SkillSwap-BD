@@ -108,6 +108,7 @@ final appRouter = GoRouter(
           path: RoutePaths.editProfile,
           name: RouteNames.editProfile,
           builder: (context, state) {
+            final fromSignUp = state.uri.queryParameters['from'] == 'signup';
             final sessionState = sl<SessionCubit>().state;
             final userId = switch (sessionState) {
               SessionAuthenticated(:final userId) => userId,
@@ -118,7 +119,7 @@ final appRouter = GoRouter(
                 BlocProvider(create: (_) => sl<ProfileFormCubit>()),
                 BlocProvider(create: (_) => sl<ProfileCubit>()..load(userId)),
               ],
-              child: const EditProfileScreen(),
+              child: EditProfileScreen(fromSignUp: fromSignUp),
             );
           },
         ),

@@ -21,11 +21,29 @@ class SkillSelectorWidget extends StatefulWidget {
   final bool isOffered;
 
   @override
-  State<SkillSelectorWidget> createState() => _SkillSelectorWidgetState();
+  State<SkillSelectorWidget> createState() => SkillSelectorWidgetState();
 }
 
-class _SkillSelectorWidgetState extends State<SkillSelectorWidget> {
+class SkillSelectorWidgetState extends State<SkillSelectorWidget> {
   final _controller = TextEditingController();
+  final _focusNode = FocusNode();
+
+  /// Commits any pending text currently typed in the input field.
+  void flushPending() {
+    _handleAdd();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(_handleFocusChange);
+  }
+
+  void _handleFocusChange() {
+    if (!_focusNode.hasFocus) {
+      _handleAdd();
+    }
+  }
 
   void _handleAdd() {
     final text = _controller.text.trim();
@@ -35,8 +53,24 @@ class _SkillSelectorWidgetState extends State<SkillSelectorWidget> {
     }
   }
 
+  void _handleChanged(String value) {
+    if (value.contains(',')) {
+      final parts = value.split(',');
+      for (final part in parts) {
+        final trimmed = part.trim();
+        if (trimmed.isNotEmpty) {
+          widget.onAddSkill(trimmed);
+        }
+      }
+      _controller.clear();
+    }
+  }
+
   @override
   void dispose() {
+    _focusNode
+      ..removeListener(_handleFocusChange)
+      ..dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -56,7 +90,11 @@ class _SkillSelectorWidgetState extends State<SkillSelectorWidget> {
             Expanded(
               child: AppTextField(
                 controller: _controller,
+                focusNode: _focusNode,
                 hint: context.tr.profileAddSkillHint,
+                textInputAction: TextInputAction.done,
+                onChanged: _handleChanged,
+                onSubmitted: (_) => _handleAdd(),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.add_circle_outline),
                   onPressed: _handleAdd,

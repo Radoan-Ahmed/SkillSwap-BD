@@ -31,7 +31,10 @@ class RegisterScreen extends StatelessWidget {
                       context,
                       context.tr.authRegisterSuccess,
                     );
-                    context.goNamed(RouteNames.discovery);
+                    context.goNamed(
+                      RouteNames.editProfile,
+                      queryParameters: {'from': 'signup'},
+                    );
                   case SignUpFailure(:final failure):
                     AppSnackbar.error(context, failure.toMessage(context));
                   case SignUpInitial() || SignUpLoading():

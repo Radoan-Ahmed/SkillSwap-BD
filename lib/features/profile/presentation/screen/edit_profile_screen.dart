@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skill_swap_bd/core/error/failure_message.dart';
 import 'package:skill_swap_bd/core/extensions/context_extension.dart';
+import 'package:skill_swap_bd/core/router/route_names.dart';
 import 'package:skill_swap_bd/core/theme/app_spacing.dart';
 import 'package:skill_swap_bd/core/utils/validators.dart';
 import 'package:skill_swap_bd/core/widgets/app_app_bar.dart';
@@ -14,13 +15,20 @@ import 'package:skill_swap_bd/features/profile/presentation/cubit/profile_form/p
 import 'package:skill_swap_bd/features/profile/presentation/widget/skill_selector_widget.dart';
 
 class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({super.key});
+  const EditProfileScreen({
+    super.key,
+    this.fromSignUp = false,
+  });
+
+  final bool fromSignUp;
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
+  final _offeredSkillsKey = GlobalKey<SkillSelectorWidgetState>();
+  final _learnedSkillsKey = GlobalKey<SkillSelectorWidgetState>();
   late final TextEditingController _nameController;
   late final TextEditingController _bioController;
 
@@ -59,7 +67,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppAppBar(
-        title: context.tr.profileEditTitle,
+        title: widget.fromSignUp
+            ? 'Setup Your Profile'
+            : context.tr.profileEditTitle,
+        leading: widget.fromSignUp ? const SizedBox.shrink() : null,
+        actions: [
+          if (widget.fromSignUp)
+            TextButton(
+              onPressed: () => context.goNamed(RouteNames.discovery),
+              child: const Text('Skip'),
+            ),
+        ],
       ),
       body: BlocListener<ProfileCubit, ProfileState>(
         listener: (context, state) {
@@ -72,7 +90,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               }
             case ProfileUpdateSuccess():
               AppSnackbar.success(context, context.tr.profileSaveSuccess);
-              context.pop(true);
+              if (widget.fromSignUp) {
+                context.goNamed(RouteNames.discovery);
+              } else if (context.canPop()) {
+                context.pop(true);
+              } else {
+                context.goNamed(RouteNames.discovery);
+              }
             case ProfileFailure(:final failure):
               AppSnackbar.error(context, failure.toMessage(context));
             case ProfileInitial() || ProfileLoading() || ProfileUpdating():
@@ -105,6 +129,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ),
                   Gaps.v24,
                   SkillSelectorWidget(
+                    key: _offeredSkillsKey,
                     title: context.tr.profileSkillsOfferedLabel,
                     skills: formState.skillsOffered,
                     onAddSkill: formCubit.addSkillOffered,
@@ -112,6 +137,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ),
                   Gaps.v24,
                   SkillSelectorWidget(
+                    key: _learnedSkillsKey,
                     title: context.tr.profileSkillsLearnedLabel,
                     skills: formState.skillsLearned,
                     isOffered: false,
@@ -123,6 +149,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     label: context.tr.commonSave,
                     isLoading: isSaving,
                     onPressed: () {
+                      _offeredSkillsKey.currentState?.flushPending();
+                      _learnedSkillsKey.currentState?.flushPending();
+                      FocusScope.of(context).unfocus();
+
                       if (formCubit.validate()) {
                         context
                             .read<ProfileCubit>()
